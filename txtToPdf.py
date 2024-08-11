@@ -44,16 +44,21 @@ def displayCanvasInfo(c, onlyKeys=False)->None:
         for key in c.__dict__:
             print(key,)
 
-def displayCanvasSize(c, unit='cm')->None:
+def displayCanvasSize(c, unitOut='cm', unitIn='pt')->None:
     # Size of a canvas is in points. 1 point = 1/72 inch.
     # 2.54 cm = 1 inch
     # 1 cm = 28.3464567 point
+
+    # `unitIn`` is not used yet.
+
     if unit == 'pt':
         print(f'Width: {round(c._pagesize[0],2)} pt, Height: {round(c._pagesize[1],2)} pt')
     elif unit == 'cm':
         print(f'Width: {round(c._pagesize[0]/72*2.54,2)} cm, Height: {round(c._pagesize[1]/72*2.54,2)} cm')
     elif unit == 'inch':
         print(f'Width: {round(c._pagesize[0]/72,2)} inch, Height: {round(c._pagesize[1]/72,2)} inch')
+
+    # float('%.2f' % (f))
 
 
 
