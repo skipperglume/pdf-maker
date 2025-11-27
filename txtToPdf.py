@@ -2,7 +2,11 @@ from reportlab.pdfgen import canvas
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from reportlab.lib.units import cm, inch
+
 import os
+from PIL import Image
+
+# import numpy as np
 
 # #edbb3b == rgb(237, 187, 59)
 YELLOW_COLOR = (237, 187, 59)
@@ -159,9 +163,28 @@ def text_over_image(
     # Set the font
     c.setFont(font_name, 24)
 
+    # Ensure the background image file exists
+    if not os.path.isfile(background_image_path):
+        raise FileNotFoundError(
+            f"Background image not found: [{background_image_path}]"
+        )
+
+    # Get the size of the image:
+
+    with Image.open(background_image_path) as img:
+        img_width, img_height = img.size
+
+    print(f"Image size: {img_width}, {img_height}")
     # Draw the background image
+    # Scale it up proportionally to fill the width
+
+    print(f"PDF Size: {c._pagesize[0]:.2f} {c._pagesize[1]:.2f}")
     c.drawImage(
-        background_image_path, 0, 0, width=c._pagesize[0], height=c._pagesize[1]
+        background_image_path,
+        0,
+        0,
+        width=c._pagesize[0],
+        height=c._pagesize[1],
     )
 
     # Read the text file
@@ -187,7 +210,10 @@ if __name__ == "__main__":
     font_name = "Faceless"
     text_file_path = "names.txt"
     pdfFilePath = "output/names_with_background.pdf"
-    background = "band_logos/Larcenia_Roe.png"
+    # background = "band_logos/Larcenia_Roe.png"
+    # background = "band_logos/A_Wake_in_Providence_symbol.webp"
+    # background = "band_logos/sunscourge.jpg"
+    background = "band_logos/Proliferation.jpg"
     # txtToPdf(text_file_path, pdfFilePath, font_path, font_name)
 
     text_over_image(
