@@ -1,8 +1,8 @@
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
-from reportlab.lib.units import cm,inch
-
+from reportlab.lib.units import cm, inch
+import os
 
 # #edbb3b == rgb(237, 187, 59)
 YELLOW_COLOR = (237, 187, 59)
@@ -11,65 +11,78 @@ YELLOW_COLOR = (237, 227, 9)
 RED_COLOR = (221, 33, 33)
 
 
-def lineBreaks(char:str='=')->None:
-    print(char*50)
+def lineBreaks(char: str = "=") -> None:
+    print(char * 50)
 
 
-def renormalizeRGB(rgb:tuple)->tuple:
-    return tuple([x/255 for x in rgb])
+def renormalizeRGB(rgb: tuple) -> tuple:
+    return tuple([x / 255 for x in rgb])
 
-def drawBackground(c, unit='cm', startPoint=(1,27), size=(19,3), color=(1,1,1))->None:
-    '''
+
+def drawBackground(
+    c, unit="cm", startPoint=(1, 27), size=(19, 3), color=(1, 1, 1)
+) -> None:
+    """
     Draw a background for the label. Background is done via drawing a rectangular shape.
-    '''
+    """
 
-    c.setFillColorRGB(*color) #choose fill colour
+    c.setFillColorRGB(*color)  # choose fill colour
 
     # `rect` method of `canvas`:
     # 'params': x, y, width, height, stroke=1, fill=0
 
-    c.rect(startPoint[0]*cm,startPoint[1]*cm,size[0]*cm,size[1]*cm, fill=1) #draw rectangle
+    c.rect(
+        startPoint[0] * cm, startPoint[1] * cm, size[0] * cm, size[1] * cm, fill=1
+    )  # draw rectangle
 
 
-def displayCanvasInfo(c, onlyKeys=False)->None:
-    '''
+def displayCanvasInfo(c, onlyKeys=False) -> None:
+    """
     Display the information of the canvas object.
-    '''
+    """
 
     if not onlyKeys:
         for key in c.__dict__:
-            print(key,':')
-            print('\t',c.__dict__[key])
+            print(key, ":")
+            print("\t", c.__dict__[key])
     else:
         for key in c.__dict__:
-            print(key,)
+            print(
+                key,
+            )
 
-def displayCanvasSize(c, unitOut='cm', unitIn='pt')->None:
+
+def displayCanvasSize(c, unitOut="cm", unitIn="pt") -> None:
     # Size of a canvas is in points. 1 point = 1/72 inch.
     # 2.54 cm = 1 inch
     # 1 cm = 28.3464567 point
 
     # `unitIn`` is not used yet.
 
-    if unit == 'pt':
-        print(f'Width: {round(c._pagesize[0],2)} pt, Height: {round(c._pagesize[1],2)} pt')
-    elif unit == 'cm':
-        print(f'Width: {round(c._pagesize[0]/72*2.54,2)} cm, Height: {round(c._pagesize[1]/72*2.54,2)} cm')
-    elif unit == 'inch':
-        print(f'Width: {round(c._pagesize[0]/72,2)} inch, Height: {round(c._pagesize[1]/72,2)} inch')
+    if unitOut == "pt":
+        print(
+            f"Width: {round(c._pagesize[0],2)} pt, Height: {round(c._pagesize[1],2)} pt"
+        )
+    elif unitOut == "cm":
+        print(
+            f"Width: {round(c._pagesize[0]/72*2.54,2)} cm, Height: {round(c._pagesize[1]/72*2.54,2)} cm"
+        )
+    elif unitOut == "inch":
+        print(
+            f"Width: {round(c._pagesize[0]/72,2)} inch, Height: {round(c._pagesize[1]/72,2)} inch"
+        )
 
     # float('%.2f' % (f))
-
 
 
 def txtToPdf(txtFilePath, pdfFilePath, fontPath, fontName):
     # Create a PDF canvas
     c = canvas.Canvas(pdfFilePath)
-    
+
     lineBreaks()
-    displayCanvasInfo(c,True)
+    displayCanvasInfo(c, True)
     lineBreaks()
-    displayCanvasInfo(c,False)
+    displayCanvasInfo(c, False)
     lineBreaks()
     displayCanvasSize(c)
 
@@ -79,15 +92,13 @@ def txtToPdf(txtFilePath, pdfFilePath, fontPath, fontName):
     # Set the font
     c.setFont(fontName, 24)
 
-
-
-    drawBackground(c,color=renormalizeRGB(YELLOW_COLOR))
+    drawBackground(c, color=renormalizeRGB(YELLOW_COLOR))
 
     # Read the text file
-    with open(txtFilePath, 'r') as file:
+    with open(txtFilePath, "r") as file:
         lines = file.readlines()
 
-    c.setFillColorRGB(*renormalizeRGB(RED_COLOR)) #choose your font colour
+    c.setFillColorRGB(*renormalizeRGB(RED_COLOR))  # choose your font colour
 
     # Write each line to the PDF
     for i, line in enumerate(lines):
@@ -96,25 +107,28 @@ def txtToPdf(txtFilePath, pdfFilePath, fontPath, fontName):
     # Save the PDF
     c.save()
 
+    print(f"Created PDF: [{pdfFilePath}] using font: [{fontName}]")
+
+
 # A path of pre-written text we want to turn into pdf format.
-txtFilePath = 'label.txt'
+txtFilePath = "label.txt"
 # The name of the pdf file we want to create.
-pdfFilePath = 'test.pdf'
+pdfFilePath = "test.pdf"
 
 # A list of font paths
 fontsPath = [
-    './AberrationDemo-WyAwV.ttf',
-    './AzvamethIntoDemo-ALrjp.ttf',
-    './AzvamethDemo-p7dnd.ttf',
-    './Faceless-K7wel.ttf',
+    "./AberrationDemo-WyAwV.ttf",
+    "./AzvamethIntoDemo-ALrjp.ttf",
+    "./AzvamethDemo-p7dnd.ttf",
+    "./Faceless-K7wel.ttf",
 ]
 
 # A list of font names
 fontsName = [
-    'Aberration',
-    'Azvameth',
-    'Azvameth',
-    'Faceless',
+    "Aberration",
+    "Azvameth",
+    "Azvameth",
+    "Faceless",
 ]
 
 # Dictinoary of font names and their paths
@@ -122,18 +136,64 @@ fontsName = [
 fontNamePath = {
     # 'Aberration': './AberrationDemo-WyAwV.ttf',
     # 'Azvameth': './AzvamethIntoDemo-ALrjp.ttf',
-    'Faceless': './Faceless-K7wel.ttf',
+    "Faceless": "./Faceless-K7wel.ttf",
 }
 
-if __name__ == '__main__':
+
+def text_over_image(
+    text_file_path,
+    pdf_file_path,
+    font_path,
+    font_name,
+    background_image_path,
+):
+    """
+    Method generates a PDF file with text over a background image.
+    """
+    # Create a PDF canvas
+    c = canvas.Canvas(pdf_file_path)
+
+    # Register the custom font
+    pdfmetrics.registerFont(TTFont(font_name, font_path))
+
+    # Set the font
+    c.setFont(font_name, 24)
+
+    # Draw the background image
+    c.drawImage(
+        background_image_path, 0, 0, width=c._pagesize[0], height=c._pagesize[1]
+    )
+
+    # Read the text file
+    with open(text_file_path, "r") as file:
+        lines = file.readlines()
+
+    c.setFillColorRGB(*renormalizeRGB(RED_COLOR))  # choose your font colour
+
+    # Write each line to the PDF
+    for i, line in enumerate(lines):
+        c.drawString(72, 800 - 15 * i, line.strip())
+
+    # Save the PDF
+    c.save()
+
+    print(f"Created PDF: [{pdf_file_path}] using font: [{font_name}]")
+
+
+if __name__ == "__main__":
     print(fontNamePath.items())
 
-    for a in enumerate(list(zip(fontNamePath.items()))):
-        print(a)
-        # (, (name, path)) = a
-        iter = a[0]
-        fontName, fontPath = a[1][0]
-        
-        
-        txtToPdf(txtFilePath, pdfFilePath, fontPath, fontName)
-    
+    font_path = "fonts/Faceless-K7wel.ttf"
+    font_name = "Faceless"
+    text_file_path = "names.txt"
+    pdfFilePath = "output/names_with_background.pdf"
+    background = "band_logos/Larcenia_Roe.png"
+    # txtToPdf(text_file_path, pdfFilePath, font_path, font_name)
+
+    text_over_image(
+        text_file_path,
+        pdfFilePath,
+        font_path,
+        font_name,
+        background,
+    )
