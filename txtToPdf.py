@@ -13,6 +13,7 @@ YELLOW_COLOR = (237, 187, 59)
 YELLOW_COLOR = (237, 227, 9)
 # #dd2121 == rgb(221, 33, 33)
 RED_COLOR = (221, 33, 33)
+BLACK_COLOR = (0, 0, 0)
 
 
 def lineBreaks(char: str = "=") -> None:
@@ -102,7 +103,8 @@ def txtToPdf(txtFilePath, pdfFilePath, fontPath, fontName):
     with open(txtFilePath, "r") as file:
         lines = file.readlines()
 
-    c.setFillColorRGB(*renormalizeRGB(RED_COLOR))  # choose your font colour
+    # c.setFillColorRGB(*renormalizeRGB(RED_COLOR))  # choose your font colour
+    c.setFillColorRGB(*renormalizeRGB(BLACK_COLOR))  # choose your font colour
 
     # Write each line to the PDF
     for i, line in enumerate(lines):
@@ -138,9 +140,12 @@ fontsName = [
 # Dictinoary of font names and their paths
 # I really Faceless, so others are commented out.
 fontNamePath = {
-    # 'Aberration': './AberrationDemo-WyAwV.ttf',
-    # 'Azvameth': './AzvamethIntoDemo-ALrjp.ttf',
-    "Faceless": "./Faceless-K7wel.ttf",
+    "Aberration": "./fonts/AberrationDemo-WyAwV.ttf",
+    "Azvameth": "./fonts/AzvamethIntoDemo-ALrjp.ttf",
+    "Faceless": "./fonts/Faceless-K7wel.ttf",
+    "Monas": "./fonts/Monas-BLBW8.ttf",
+    "DansDisney_1": "./fonts/DansDisney-3nJ8.ttf",
+    "DansDisney_2": "./fonts/DansDisneyUi-x5Aq.ttf",
 }
 
 
@@ -157,45 +162,58 @@ def text_over_image(
     # Create a PDF canvas
     c = canvas.Canvas(pdf_file_path)
 
-    # Register the custom font
-    pdfmetrics.registerFont(TTFont(font_name, font_path))
+    if background_image_path is not None:
+        # Ensure the background image file exists
+        if not os.path.isfile(background_image_path):
+            raise FileNotFoundError(
+                f"Background image not found: [{background_image_path}]"
+            )
+        # Get the size of the image:
 
-    # Set the font
-    c.setFont(font_name, 24)
+        with Image.open(background_image_path) as img:
+            img_width, img_height = img.size
 
-    # Ensure the background image file exists
-    if not os.path.isfile(background_image_path):
-        raise FileNotFoundError(
-            f"Background image not found: [{background_image_path}]"
+        print(f"Image size: {img_width}, {img_height}")
+        # Draw the background image
+        # Scale it up proportionally to fill the width
+
+        print(f"PDF Size: {c._pagesize[0]:.2f} {c._pagesize[1]:.2f}")
+
+        # Rescale hieght:
+        new_img_width = c._pagesize[0]
+        new_img_height = new_img_width / img_width * img_height
+
+        print(f"Rescaled Image size: {new_img_width}, {new_img_height}")
+
+        # Print image RGB values
+        print(img.getbands())
+        # Print R
+        # print(img.getchannel("R"))
+
+        c.drawImage(
+            background_image_path,
+            0,
+            0,
+            width=new_img_width,
+            height=new_img_height,
         )
-
-    # Get the size of the image:
-
-    with Image.open(background_image_path) as img:
-        img_width, img_height = img.size
-
-    print(f"Image size: {img_width}, {img_height}")
-    # Draw the background image
-    # Scale it up proportionally to fill the width
-
-    print(f"PDF Size: {c._pagesize[0]:.2f} {c._pagesize[1]:.2f}")
-    c.drawImage(
-        background_image_path,
-        0,
-        0,
-        width=c._pagesize[0],
-        height=c._pagesize[1],
-    )
 
     # Read the text file
     with open(text_file_path, "r") as file:
         lines = file.readlines()
 
-    c.setFillColorRGB(*renormalizeRGB(RED_COLOR))  # choose your font colour
+    # Register the custom font
+    pdfmetrics.registerFont(TTFont(font_name, font_path))
+
+    # Set the font
+    c.setFont(font_name, 50)
+
+    # c.setFillColorRGB(*renormalizeRGB(RED_COLOR))  # choose your font colour
+    c.setFillColorRGB(*renormalizeRGB(BLACK_COLOR))  # choose your font colour
 
     # Write each line to the PDF
     for i, line in enumerate(lines):
-        c.drawString(72, 800 - 15 * i, line.strip())
+        c.drawString(100, 800 - 50 * i, line.strip())
 
     # Save the PDF
     c.save()
@@ -206,14 +224,15 @@ def text_over_image(
 if __name__ == "__main__":
     print(fontNamePath.items())
 
-    font_path = "fonts/Faceless-K7wel.ttf"
-    font_name = "Faceless"
+    background = None
+    font_name = "DansDisney_1"
+    font_path = fontNamePath[font_name]
     text_file_path = "names.txt"
     pdfFilePath = "output/names_with_background.pdf"
     # background = "band_logos/Larcenia_Roe.png"
     # background = "band_logos/A_Wake_in_Providence_symbol.webp"
     # background = "band_logos/sunscourge.jpg"
-    background = "band_logos/Proliferation.jpg"
+    # background = "band_logos/Proliferation.jpg"
     # txtToPdf(text_file_path, pdfFilePath, font_path, font_name)
 
     text_over_image(
